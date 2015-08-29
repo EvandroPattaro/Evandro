@@ -1,0 +1,34 @@
+User Function EXPEXCEL()
+	
+Local aFcabec := {}
+Local aFdados := {} 
+
+If !ApOleClient("MSExcel")
+
+	MsgAlert("Microsoft Excel não instalado!")
+
+	Return ()
+
+EndIf  
+	
+aFcabec := {"FILIAL", "CLIENTE / LOJA", "TELEFONE", "VENDEDOR", "TIPO/SÉRIE/TÍTULO/PARCELA", "VALOR(R$)", "SALDO(R$)", "EMISSÃO", "VENCIMENTO", "ATRASO"}
+	
+	
+DO WHILE QUERY->(!EOF())
+	
+	AAdd(aFdados, {QUERY->E1_FILIAL,QUERY->A1_COD + "/" + QUERY->A1_LOJA + " - " + QUERY->A1_NOME, ALLTRIM(QUERY->A1_DDD) + " - " +  ALLTRIM(QUERY->A1_TEL), QUERY->E1_VEND1 + " - " +  QUERY->A3_NOME, QUERY->E1_TIPO + "/" + QUERY->E1_SERIE  + "/" +  QUERY->E1_NUM  + "/" + QUERY->E1_PARCELA,TRANSFORM(QUERY->E1_VALOR,'@E 999,999,999.99' ),TRANSFORM(QUERY->E1_SALDO,'@E 999,999,999.99' ), SUBSTR(QUERY->E1_EMISSAO,7,2) + "/" + SUBSTR(QUERY->E1_EMISSAO,5,2) + "/" + SUBSTR(QUERY->E1_EMISSAO,1,4),SUBSTR(QUERY->E1_VENCREA,7,2) + "/" + SUBSTR(QUERY->E1_VENCREA,5,2) + "/" + SUBSTR(QUERY->E1_VENCREA,1,4),TRANSFORM(QUERY->DIAS,'@E 999,999,999' )})
+	
+	QUERY->(DBSKIP())
+	
+ENDDO
+
+QUERY->(DBCLOSEAREA())
+
+DlgToExcel({ {"ARRAY", "COBRANCA POR GRUPO DE CLIENTES", aFcabec, aFdados} })
+
+RETURN()
+
+
+
+
+
